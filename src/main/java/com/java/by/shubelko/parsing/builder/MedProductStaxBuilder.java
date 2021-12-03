@@ -1,4 +1,4 @@
-package com.java.by.shubelko.parsing.builder.impl;
+package com.java.by.shubelko.parsing.builder;
 
 import com.java.by.shubelko.parsing.entity.Baa;
 import com.java.by.shubelko.parsing.entity.MedProduct;

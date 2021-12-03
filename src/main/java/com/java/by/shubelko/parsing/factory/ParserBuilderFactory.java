@@ -2,9 +2,9 @@ package com.java.by.shubelko.parsing.factory;
 
 import com.java.by.shubelko.parsing.exception.MedProductException;
 import com.java.by.shubelko.parsing.builder.AbstractMedProductBuilder;
-import com.java.by.shubelko.parsing.builder.impl.MedProductDomBuilder;
-import com.java.by.shubelko.parsing.builder.impl.MedProductSaxBuilder;
-import com.java.by.shubelko.parsing.builder.impl.MedProductStaxBuilder;
+import com.java.by.shubelko.parsing.builder.MedProductDomBuilder;
+import com.java.by.shubelko.parsing.builder.MedProductSaxBuilder;
+import com.java.by.shubelko.parsing.builder.MedProductStaxBuilder;
 
 public class ParserBuilderFactory {
 
