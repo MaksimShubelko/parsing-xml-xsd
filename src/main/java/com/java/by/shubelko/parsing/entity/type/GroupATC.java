@@ -1,11 +1,11 @@
-package com.java.by.shubelko.parsing.entity.enumsource;
+package com.java.by.shubelko.parsing.entity.type;
 
 public enum GroupATC {
 
     METABOLIC,
     INTERMEDIATES,
-    HISTAMINILYTICS,
-    ACTINOMYCUNS,
+    HISTAMINOLYTICS,
+    ACTINOMYCINS,
     BISPHOSPHONATES,
     AMINOACIDS,
     ANTIBIOTICS,

@@ -1,15 +1,13 @@
 package com.java.by.shubelko.parsing.entity;
 
-import com.java.by.shubelko.parsing.entity.enumsource.Country;
-import com.java.by.shubelko.parsing.entity.enumsource.GroupATC;
-import com.java.by.shubelko.parsing.entity.enumsource.Pack;
+import com.java.by.shubelko.parsing.entity.type.Country;
+import com.java.by.shubelko.parsing.entity.type.GroupATC;
+import com.java.by.shubelko.parsing.entity.type.Pack;
 
 import java.time.YearMonth;
 import java.util.List;
 
-public abstract class MedProduct {
-
-    public static final boolean DEFAULT_OUT_OF_PRODUCTION = false;
+public abstract class AbstractMedProduct {
 
     private String medProductId;
     private boolean outOfProduction;
@@ -19,12 +17,12 @@ public abstract class MedProduct {
     private List<String> analogs;
     private Version version = new Version();
 
-    public MedProduct() {
+    public AbstractMedProduct() {
 
     }
 
-    public MedProduct(String medProductID, boolean outOfProduction, String name, String pharma, GroupATC group,
-                      List<String> analogs, Version version) {
+    public AbstractMedProduct(String medProductID, boolean outOfProduction, String name, String pharma, GroupATC group,
+                              List<String> analogs, Version version) {
         this.medProductId = medProductID;
         this.outOfProduction = outOfProduction;
         this.name = name;
@@ -108,7 +106,7 @@ public abstract class MedProduct {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MedProduct that = (MedProduct) o;
+        AbstractMedProduct that = (AbstractMedProduct) o;
         return outOfProduction == that.outOfProduction &&
                 medProductId.equals(that.medProductId) &&
                 name.equals(that.name) &&

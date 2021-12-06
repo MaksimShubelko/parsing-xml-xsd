@@ -1,13 +1,13 @@
 package com.java.by.shubelko.parsing.handler;
 
-import com.java.by.shubelko.parsing.builder.enumsource.MedProductXmlAttribute;
-import com.java.by.shubelko.parsing.builder.enumsource.MedProductXmlTag;
+import com.java.by.shubelko.parsing.builder.type.MedProductXmlAttribute;
+import com.java.by.shubelko.parsing.builder.type.MedProductXmlTag;
 import com.java.by.shubelko.parsing.entity.Baa;
-import com.java.by.shubelko.parsing.entity.MedProduct;
+import com.java.by.shubelko.parsing.entity.AbstractMedProduct;
 import com.java.by.shubelko.parsing.entity.Medicine;
-import com.java.by.shubelko.parsing.entity.enumsource.Country;
-import com.java.by.shubelko.parsing.entity.enumsource.GroupATC;
-import com.java.by.shubelko.parsing.entity.enumsource.Pack;
+import com.java.by.shubelko.parsing.entity.type.Country;
+import com.java.by.shubelko.parsing.entity.type.GroupATC;
+import com.java.by.shubelko.parsing.entity.type.Pack;
 import org.xml.sax.Attributes;
 
 import java.time.YearMonth;
@@ -18,22 +18,21 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class MedProductHandler extends DefaultHandler {
-
     public static final Logger logger = LogManager.getLogger();
     private static final String SPACE_SEPARATOR = " ";
-    private static Set<MedProduct> medProducts;
+    private static Set<AbstractMedProduct> abstractMedProducts;
     private final EnumSet<MedProductXmlTag> possibleXmlTag;
-    private MedProduct currentMedProduct;
+    private AbstractMedProduct currentAbstractMedProduct;
     private MedProductXmlTag currentXmlTag;
 
     public MedProductHandler() {
-		medProducts = new HashSet<MedProduct>();
+		abstractMedProducts = new HashSet<AbstractMedProduct>();
         possibleXmlTag = EnumSet.range(MedProductXmlTag.NAME, MedProductXmlTag.DOSAGE);
 
     }
 
-    public Set<MedProduct> getMedCatalog() {
-        return medProducts;
+    public Set<AbstractMedProduct> getMedCatalog() {
+        return abstractMedProducts;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class MedProductHandler extends DefaultHandler {
         String medicineTag = MedProductXmlTag.MEDICINE.toString();
         String baaTag = MedProductXmlTag.BAA.toString();
         if (medicineTag.equals(qName) || baaTag.equals(qName)) {
-            currentMedProduct = medicineTag.equals(qName) ? new Medicine() : new Baa();
+            currentAbstractMedProduct = medicineTag.equals(qName) ? new Medicine() : new Baa();
             defineAttributes(attributes);
         } else {
             MedProductXmlTag temp = MedProductXmlTag.valueOfXmlTag(qName);
@@ -58,8 +57,8 @@ public class MedProductHandler extends DefaultHandler {
         String baaTag = MedProductXmlTag.BAA.toString();
 
         if (medicinTag.equals(qName) || baaTag.equals(qName)) {
-            medProducts.add(currentMedProduct);
-            logger.info("add to set " + currentMedProduct);
+            abstractMedProducts.add(currentAbstractMedProduct);
+            logger.info("add to set " + currentAbstractMedProduct);
         }
     }
 
@@ -69,37 +68,36 @@ public class MedProductHandler extends DefaultHandler {
         String data = new String(ch, start, length).trim();
 
         if (currentXmlTag != null) {
-
             switch (currentXmlTag) {
-                case NAME -> currentMedProduct.setName(data);
-                case PHARMA -> currentMedProduct.setPharma(data);
-                case GROUP -> currentMedProduct.setGroup(GroupATC.valueOf(data));
-                case ANALOGS -> currentMedProduct.setAnalogs(Arrays.asList(data.split(SPACE_SEPARATOR)));
-                case COUNTRY -> currentMedProduct.getVersion().setCountry(Country.valueOfXmlContent(data));
-                case CERTIFICATE -> currentMedProduct.getVersion().setCertificate(data);
-                case DATA_FROM -> currentMedProduct.getVersion().setDataFrom(YearMonth.parse(data));
-                case DATA_TO -> currentMedProduct.getVersion().setDataTo(YearMonth.parse(data));
-                case PACK -> currentMedProduct.getVersion().setPack(Pack.valueOfXmlContent(data));
-                case DOSAGE -> currentMedProduct.getVersion().setDosage(data);
+                case NAME -> currentAbstractMedProduct.setName(data);
+                case PHARMA -> currentAbstractMedProduct.setPharma(data);
+                case GROUP -> currentAbstractMedProduct.setGroup(GroupATC.valueOfXmlTag(data));
+                case ANALOGS -> currentAbstractMedProduct.setAnalogs(Arrays.asList(data.split(SPACE_SEPARATOR)));
+                case COUNTRY -> currentAbstractMedProduct.getVersion().setCountry(Country.valueOfXmlTag(data));
+                case CERTIFICATE -> currentAbstractMedProduct.getVersion().setCertificate(data);
+                case DATA_FROM -> currentAbstractMedProduct.getVersion().setDataFrom(YearMonth.parse(data));
+                case DATA_TO -> currentAbstractMedProduct.getVersion().setDataTo(YearMonth.parse(data));
+                case PACK -> currentAbstractMedProduct.getVersion().setPack(Pack.valueOfXmlTag(data));
+                case DOSAGE -> currentAbstractMedProduct.getVersion().setDosage(data);
                 case CODE_CAS -> {
-                    Medicine temp = (Medicine) currentMedProduct;
+                    Medicine temp = (Medicine) currentAbstractMedProduct;
                     temp.setCodeCAS(data);
-                    currentMedProduct = temp;
+                    currentAbstractMedProduct = temp;
                 }
                 case ACTIVE_SUBSTANCE -> {
-                    Medicine temp = (Medicine) currentMedProduct;
+                    Medicine temp = (Medicine) currentAbstractMedProduct;
                     temp.setActiveSubstance(data);
-                    currentMedProduct = temp;
+                    currentAbstractMedProduct = temp;
                 }
                 case NEED_RECIPE -> {
-                    Medicine temp = (Medicine) currentMedProduct;
+                    Medicine temp = (Medicine) currentAbstractMedProduct;
                     temp.setNeedRecipe(Boolean.parseBoolean(data));
-                    currentMedProduct = temp;
+                    currentAbstractMedProduct = temp;
                 }
                 case COMPOSITION -> {
-                    Baa temp = (Baa) currentMedProduct;
+                    Baa temp = (Baa) currentAbstractMedProduct;
                     temp.setComposition(Arrays.asList(data.split(SPACE_SEPARATOR)));
-                    currentMedProduct = temp;
+                    currentAbstractMedProduct = temp;
                 }
                 default -> throw new EnumConstantNotPresentException(currentXmlTag.getDeclaringClass(),
                         currentXmlTag.name());
@@ -111,13 +109,11 @@ public class MedProductHandler extends DefaultHandler {
     private void defineAttributes(Attributes attributes) {
 
         String medProductId = attributes.getValue(MedProductXmlAttribute.ID.toString());
-        currentMedProduct.setMedProductId(medProductId);
+        currentAbstractMedProduct.setMedProductId(medProductId);
 
         String outOfProductions = attributes.getValue(MedProductXmlAttribute.OUT_OF_PRODUCTION.toString());
         if (outOfProductions != null) {
-            currentMedProduct.setOutOfProduction(Boolean.parseBoolean(outOfProductions));
-        } else {
-            currentMedProduct.setOutOfProduction(MedProduct.DEFAULT_OUT_OF_PRODUCTION);
+            currentAbstractMedProduct.setOutOfProduction(Boolean.parseBoolean(outOfProductions));
         }
     }
 

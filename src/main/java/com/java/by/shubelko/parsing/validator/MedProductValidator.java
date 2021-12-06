@@ -16,6 +16,8 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class MedProductValidator {
 
@@ -29,30 +31,36 @@ public class MedProductValidator {
         return instance;
     }
 
-    public boolean validateXml(String xmlPath, String schemaPath) throws MedProductException {
-        boolean isXmlFileValid = false;
+    public boolean validateXml(String xmlPath, String xsdPath) throws MedProductException, URISyntaxException {
+        boolean isValid = true;
         logger.log(Level.INFO, "Try to validate...");
         String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
         SchemaFactory factory = SchemaFactory.newInstance(language);
-        File schemaLocation = new File(schemaPath);
         try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            classLoader.getResourceAsStream(xmlPath);
+            URL resourceXml = classLoader.getResource(xmlPath);
+            classLoader.getResourceAsStream(xsdPath);
+            URL resourceXsd = classLoader.getResource(xsdPath);
+            if (resourceXsd == null || resourceXml == null) {
+                throw new MedProductException("Paths are null or incorrect!" + xmlPath + " " + xsdPath);
+            }
+            File schemaLocation = new File(resourceXsd.toURI());
             Schema schema = factory.newSchema(schemaLocation);
             Validator validator = schema.newValidator();
-            Source source = new StreamSource(xmlPath);
+            Source source = new StreamSource(resourceXml.getPath());
             MedProductErrorHandler errorHandler = new MedProductErrorHandler();
             validator.setErrorHandler(errorHandler);
             validator.validate(source);
-            logger.log(Level.ERROR, "Xml file " + xmlPath + " is not valid.");
-            isXmlFileValid = true;
-        } catch (IOException ioException) {
+            if (errorHandler.isErrorHappened()) {
+                isValid = false;
+            }
+        } catch (IOException | SAXException ioException) {
             logger.log(Level.ERROR, "IO exception during work with files " +
-                    xmlPath + "; " + schemaPath, ioException.getMessage());
+                    xmlPath + "; " + xsdPath, ioException);
             throw new MedProductException("IO exception during work with files");
-        } catch (SAXException saxException) {
-            logger.log(Level.ERROR, "Xml file " + xmlPath + " is not valid." + saxException.getMessage());
         }
-
         logger.log(Level.INFO, "Validation has been finished successfully!");
-        return isXmlFileValid;
+        return isValid;
     }
 }

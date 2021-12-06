@@ -1,4 +1,4 @@
-package com.java.by.shubelko.parsing.entity.enumsource;
+package com.java.by.shubelko.parsing.entity.type;
 
 public enum Pack {
 
@@ -20,7 +20,7 @@ public enum Pack {
         return this.name().toLowerCase().replace(UNDERSCORE, HYPHEN);
     }
 
-    public static Pack valueOfXmlContent(String tag) {
+    public static Pack valueOfXmlTag(String tag) {
         return Pack.valueOf(tag.toUpperCase().replace(HYPHEN, UNDERSCORE));
     }
 }

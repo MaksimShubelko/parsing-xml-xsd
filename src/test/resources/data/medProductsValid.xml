@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<med-products
+        xmlns="http://www.javacourse.by/med-product"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.javacourse.by/med-product medProductsSchema.xsd ">
+
+    <medicine id="med1">
+        <name>Atomax</name>
+        <pharma>Med Company</pharma>
+        <group>aminoacids</group>
+        <analogs>Taurine</analogs>
+        <version>
+            <country>Israel</country>
+            <certificate>1255.DF54565.1587RE</certificate>
+            <data-from>2021-01</data-from>
+            <data-to>2022-01</data-to>
+            <pack>Pill</pack>
+            <dosage>50mg</dosage>
+        </version>
+        <code-cas>1235-67-8</code-cas>
+        <active-substance>atorvastatin</active-substance>
+        <need-recipe>false</need-recipe>
+    </medicine>
+
+    <baa id="med2" out-of-production="false">
+        <name>Vardenafilum</name>
+        <pharma>Med Company</pharma>
+        <group>intermediates</group>
+        <analogs>Gooder Weller</analogs>
+        <version>
+            <country>Russia</country>
+            <certificate>1889.589-31.SS157</certificate>
+            <data-from>2020-07</data-from>
+            <data-to>2023-01</data-to>
+            <pack>Gel</pack>
+            <dosage>100ml</dosage>
+        </version>
+        <composition>Mentol Oil</composition>
+    </baa>
+</med-products>

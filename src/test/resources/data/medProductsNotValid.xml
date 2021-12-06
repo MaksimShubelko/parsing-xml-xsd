@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<med-products
+        xmlns="http://www.javacourse.by/med-product"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.javacourse.by/med-product medProductsSchema.xsd ">
+
+
+    <medicine id="med1">
+        <version>
+            <country>China</country>
+            <certificate>56774-12-368968</certificate>
+        </version>
+    </medicine>
+
+</med-products>

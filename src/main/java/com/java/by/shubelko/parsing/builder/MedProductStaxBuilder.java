@@ -1,15 +1,14 @@
 package com.java.by.shubelko.parsing.builder;
 
+import com.java.by.shubelko.parsing.builder.type.MedProductXmlAttribute;
+import com.java.by.shubelko.parsing.builder.type.MedProductXmlTag;
+import com.java.by.shubelko.parsing.entity.AbstractMedProduct;
 import com.java.by.shubelko.parsing.entity.Baa;
-import com.java.by.shubelko.parsing.entity.MedProduct;
 import com.java.by.shubelko.parsing.entity.Medicine;
-import com.java.by.shubelko.parsing.entity.enumsource.Country;
-import com.java.by.shubelko.parsing.entity.enumsource.GroupATC;
-import com.java.by.shubelko.parsing.entity.enumsource.Pack;
+import com.java.by.shubelko.parsing.entity.type.Country;
+import com.java.by.shubelko.parsing.entity.type.GroupATC;
+import com.java.by.shubelko.parsing.entity.type.Pack;
 import com.java.by.shubelko.parsing.exception.MedProductException;
-import com.java.by.shubelko.parsing.builder.AbstractMedProductBuilder;
-import com.java.by.shubelko.parsing.builder.enumsource.MedProductXmlAttribute;
-import com.java.by.shubelko.parsing.builder.enumsource.MedProductXmlTag;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,12 +21,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.YearMonth;
 import java.util.Arrays;
 
 public class MedProductStaxBuilder extends AbstractMedProductBuilder {
     private static final Logger logger = LogManager.getLogger();
-    private static final String SPACE_SEPARATOR = " ";
     private XMLInputFactory inputFactory;
 
     public MedProductStaxBuilder() {
@@ -38,42 +38,46 @@ public class MedProductStaxBuilder extends AbstractMedProductBuilder {
     public void buildSetMedProducts(String xmlPath) throws MedProductException {
         XMLStreamReader reader;
         String name;
-        try (FileInputStream inputStream = new FileInputStream(new File(xmlPath))) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        classLoader.getResourceAsStream(xmlPath);
+        URL resourceXml = classLoader.getResource(xmlPath);
+        if (resourceXml == null) {
+            throw new MedProductException("Path is null or incorrect! " + xmlPath);
+        }
+        try (FileInputStream inputStream = new FileInputStream(new File(resourceXml.toURI()))) {
             reader = inputFactory.createXMLStreamReader(inputStream);
             while (reader.hasNext()) {
                 int type = reader.next();
                 if (type == XMLStreamConstants.START_ELEMENT) {
                     name = reader.getLocalName();
                     if (name.equals(MedProductXmlTag.MEDICINE.toString()) || name.equals(MedProductXmlTag.BAA.toString())) {
-                        MedProduct medProduct = buildMedProduct(reader);
-                        logger.log(Level.INFO,"add to catalog" + medProduct);
-                        medProducts.add(medProduct);
+                        AbstractMedProduct abstractMedProduct = buildMedProduct(reader);
+                        logger.log(Level.INFO, "add to catalog" + abstractMedProduct);
+                        medProducts.add(abstractMedProduct);
                     }
                 }
             }
         } catch (FileNotFoundException e) {
-            logger.log(Level.ERROR, "FileNotFoundException during work with file" + xmlPath);
+            logger.log(Level.ERROR, "FileNotFoundException during work with file" + xmlPath, e);
             throw new MedProductException("FileNotFoundException during work with file " + xmlPath, e);
         } catch (IOException e) {
-            logger.log(Level.ERROR,"IOException during work with file " + xmlPath);
+            logger.log(Level.ERROR, "IOException during work with file " + xmlPath, e);
             throw new MedProductException("IOException during work with file " + xmlPath, e);
-        } catch (XMLStreamException e) {
-            logger.log(Level.ERROR,"XMLStreamException while building" + medProducts);
-            throw new MedProductException("XMLStreamException while building", e);
+        } catch (XMLStreamException | URISyntaxException e) {
+            logger.log(Level.ERROR, "XMLStreamException while building set of medical products", e);
+            throw new MedProductException("XMLStreamException while building set of medical products", e);
         }
     }
 
-    private MedProduct buildMedProduct(XMLStreamReader reader) throws XMLStreamException {
-        MedProduct currentMedProduct = reader.getLocalName().equals(MedProductXmlTag.MEDICINE.toString())
+    private AbstractMedProduct buildMedProduct(XMLStreamReader reader) throws XMLStreamException {
+        AbstractMedProduct currentAbstractMedProduct = reader.getLocalName().equals(MedProductXmlTag.MEDICINE.toString())
                 ? new Medicine()
                 : new Baa();
 
-        currentMedProduct.setMedProductId(reader.getAttributeValue(null, MedProductXmlAttribute.ID.toString()));
+        currentAbstractMedProduct.setMedProductId(reader.getAttributeValue(null, MedProductXmlAttribute.ID.toString()));
         String content = reader.getAttributeValue(null, MedProductXmlAttribute.OUT_OF_PRODUCTION.toString());
         if (content != null) {
-            currentMedProduct.setOutOfProduction(Boolean.parseBoolean(content));
-        } else {
-            currentMedProduct.setOutOfProduction(MedProduct.DEFAULT_OUT_OF_PRODUCTION);
+            currentAbstractMedProduct.setOutOfProduction(Boolean.parseBoolean(content));
         }
 
         String name;
@@ -83,45 +87,45 @@ public class MedProductStaxBuilder extends AbstractMedProductBuilder {
                 case XMLStreamConstants.START_ELEMENT:
                     name = reader.getLocalName();
                     switch (MedProductXmlTag.valueOfXmlTag(name)) {
-                        case NAME -> currentMedProduct.setName(getXMLText(reader));
-                        case PHARMA -> currentMedProduct.setPharma(getXMLText(reader));
-                        case GROUP -> currentMedProduct.setGroup(GroupATC.valueOf(getXMLText(reader)));
-                        case ANALOGS -> currentMedProduct.setAnalogs(Arrays.asList(getXMLText(reader).split(SPACE_SEPARATOR)));
-                        case VERSION -> currentMedProduct.setVersion(getXMLMedProductVersion(reader));
+                        case NAME -> currentAbstractMedProduct.setName(getXMLText(reader));
+                        case PHARMA -> currentAbstractMedProduct.setPharma(getXMLText(reader));
+                        case GROUP -> currentAbstractMedProduct.setGroup(GroupATC.valueOfXmlTag(getXMLText(reader)));
+                        case ANALOGS -> currentAbstractMedProduct.setAnalogs(Arrays.asList(getXMLText(reader).split(SPACE_SEPARATOR)));
+                        case VERSION -> currentAbstractMedProduct.setVersion(getXMLMedProductVersion(reader));
                         case CODE_CAS -> {
-                            Medicine temp = (Medicine) currentMedProduct;
+                            Medicine temp = (Medicine) currentAbstractMedProduct;
                             temp.setCodeCAS(getXMLText(reader));
-                            currentMedProduct = temp;
+                            currentAbstractMedProduct = temp;
                         }
                         case ACTIVE_SUBSTANCE -> {
-                            Medicine temp = (Medicine) currentMedProduct;
+                            Medicine temp = (Medicine) currentAbstractMedProduct;
                             temp.setActiveSubstance(getXMLText(reader));
-                            currentMedProduct = temp;
+                            currentAbstractMedProduct = temp;
                         }
                         case NEED_RECIPE -> {
-                            Medicine temp = (Medicine) currentMedProduct;
+                            Medicine temp = (Medicine) currentAbstractMedProduct;
                             temp.setNeedRecipe(Boolean.parseBoolean(getXMLText(reader)));
-                            currentMedProduct = temp;
+                            currentAbstractMedProduct = temp;
                         }
                         case COMPOSITION -> {
-                            Baa temp = (Baa) currentMedProduct;
+                            Baa temp = (Baa) currentAbstractMedProduct;
                             temp.setComposition(Arrays.asList(getXMLText(reader).split(SPACE_SEPARATOR)));
-                            currentMedProduct = temp;
+                            currentAbstractMedProduct = temp;
                         }
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
                     name = reader.getLocalName();
                     if (name.equals(MedProductXmlTag.MEDICINE.toString()) || name.equals(MedProductXmlTag.BAA.toString())) {
-                        return currentMedProduct;
+                        return currentAbstractMedProduct;
                     }
             }
         }
         throw new XMLStreamException("Unknown element in tag <medicine> or <baa>");
     }
 
-    private MedProduct.Version getXMLMedProductVersion(XMLStreamReader reader) throws XMLStreamException {
-        MedProduct.Version version = new Medicine().getVersion();
+    private AbstractMedProduct.Version getXMLMedProductVersion(XMLStreamReader reader) throws XMLStreamException {
+        AbstractMedProduct.Version version = new Medicine().getVersion();
         String name;
 
         while (reader.hasNext()) {
@@ -130,11 +134,11 @@ public class MedProductStaxBuilder extends AbstractMedProductBuilder {
                 case XMLStreamConstants.START_ELEMENT:
                     name = reader.getLocalName();
                     switch (MedProductXmlTag.valueOfXmlTag(name)) {
-                        case COUNTRY -> version.setCountry(Country.valueOf(getXMLText(reader)));
+                        case COUNTRY -> version.setCountry(Country.valueOfXmlTag(getXMLText(reader)));
                         case CERTIFICATE -> version.setCertificate(getXMLText(reader));
                         case DATA_FROM -> version.setDataFrom(YearMonth.parse(getXMLText(reader)));
                         case DATA_TO -> version.setDataTo(YearMonth.parse(getXMLText(reader)));
-                        case PACK -> version.setPack(Pack.valueOf(getXMLText(reader)));
+                        case PACK -> version.setPack(Pack.valueOfXmlTag(getXMLText(reader)));
                         case DOSAGE -> version.setDosage(getXMLText(reader));
                     }
                     break;
@@ -150,7 +154,7 @@ public class MedProductStaxBuilder extends AbstractMedProductBuilder {
 
     private String getXMLText(XMLStreamReader reader) throws XMLStreamException {
         String text = null;
-        if (reader.hasNext()) {
+        if (reader.hasNext() ) {
             reader.next();
             text = reader.getText();
         }

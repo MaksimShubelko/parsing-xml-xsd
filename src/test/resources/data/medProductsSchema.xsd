@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.javacourse.by/med-product"
+        xmlns:c="http://www.javacourse.by/med-product"
+        elementFormDefault="qualified">
+
+    <element name="med-product" type="c:med-product" abstract="true"/>
+    <element name="medicine" type="c:medicine" substitutionGroup="c:med-product"/>
+    <element name="baa" type="c:baa" substitutionGroup="c:med-product"/>
+
+    <element name="med-products">
+        <complexType>
+            <sequence>
+                <element ref="c:med-product" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="med-product">
+        <sequence>
+            <element name="name" type="string" maxOccurs="15"/>
+            <element name="pharma" type="string" maxOccurs="15"/>
+            <element name="group" type="c:group-atc"/>
+            <element name="analogs" type="c:list-string"/>
+            <element name="version" type="c:version"/>
+        </sequence>
+        <attribute name="id" type="c:med-product-id" use="required"/>
+        <attribute name="out-of-production" type="boolean"
+                   use="optional" default="false"/>
+    </complexType>
+
+    <complexType name="medicine">
+        <complexContent>
+            <extension base="c:med-product">
+                <sequence>
+                    <element name="code-cas" type="c:code-cas"/>
+                    <element name="active-substance" type="string" maxOccurs="20"/>
+                    <element name="need-recipe" type="boolean"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="baa">
+        <complexContent>
+            <extension base="c:med-product">
+                <sequence>
+                    <element name="composition" type="c:list-string"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="version">
+        <sequence>
+            <element name="country" type="c:country"/>
+            <element name="certificate" type="string"/>
+            <element name="data-from" type="gYearMonth"/>
+            <element name="data-to" type="gYearMonth"/>
+            <element name="pack" type="c:pack"/>
+            <element name="dosage" type="c:dosage"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="group-atc">
+        <restriction base="string">
+            <enumeration value="metabolic"/>
+            <enumeration value="intermediates"/>
+            <enumeration value="histaminolytics"/>
+            <enumeration value="actinomycins"/>
+            <enumeration value="bisphosphonates"/>
+            <enumeration value="aminoacids"/>
+            <enumeration value="antibiotics"/>
+            <enumeration value="antiestrogens"/>
+            <enumeration value="absorbents"/>
+            <enumeration value="sulfonamides"/>
+            <enumeration value="aminoquinolines"/>
+            <enumeration value="taxa"/>
+            <enumeration value="biguanides"/>
+            <enumeration value="soporific"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="country">
+        <restriction base="string">
+            <enumeration value="Germany"/>
+            <enumeration value="Belarus"/>
+            <enumeration value="Belgium"/>
+            <enumeration value="Russia"/>
+            <enumeration value="Czech-Republic"/>
+            <enumeration value="India"/>
+            <enumeration value="Israel"/>
+            <enumeration value="Poland"/>
+            <enumeration value="China"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="pack">
+        <restriction base="string">
+            <enumeration value="Pill"/>
+            <enumeration value="Capsule"/>
+            <enumeration value="Powder"/>
+            <enumeration value="Ointment"/>
+            <enumeration value="Gel"/>
+            <enumeration value="Solution-for-injection"/>
+            <enumeration value="Mixture"/>
+            <enumeration value="Aerosol"/>
+            <enumeration value="Drop"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="code-cas">
+        <restriction base="string">
+            <pattern value="\d{1,7}-\d{2}-\d"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="dosage">
+        <restriction base="string">
+            <pattern value="\d+((ml)|(mg))"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="med-product-id">
+        <restriction base="ID">
+            <pattern value="\w{1,10}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="list-string">
+        <list itemType="string"/>
+    </simpleType>
+
+</schema>

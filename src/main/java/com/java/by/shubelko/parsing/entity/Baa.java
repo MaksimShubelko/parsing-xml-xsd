@@ -1,11 +1,11 @@
 package com.java.by.shubelko.parsing.entity;
 
-import com.java.by.shubelko.parsing.entity.enumsource.GroupATC;
+import com.java.by.shubelko.parsing.entity.type.GroupATC;
 
 import java.util.List;
 import java.util.Objects;
 
-public class Baa extends MedProduct {
+public class Baa extends AbstractMedProduct {
 
     private List<String> composition;
 

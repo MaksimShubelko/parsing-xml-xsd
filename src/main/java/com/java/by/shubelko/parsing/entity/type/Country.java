@@ -1,4 +1,4 @@
-package com.java.by.shubelko.parsing.entity.enumsource;
+package com.java.by.shubelko.parsing.entity.type;
 
 public enum Country {
 
@@ -20,7 +20,7 @@ public enum Country {
         return this.name().toLowerCase().replace(UNDERSCORE, HYPHEN);
     }
 
-    public static Country valueOfXmlContent(String tag) {
+    public static Country valueOfXmlTag(String tag) {
         return Country.valueOf(tag.toUpperCase().replace(HYPHEN, UNDERSCORE));
     }
 }

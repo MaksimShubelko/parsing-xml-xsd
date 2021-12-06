@@ -1,23 +1,24 @@
 package com.java.by.shubelko.parsing.builder;
 
-import com.java.by.shubelko.parsing.entity.MedProduct;
+import com.java.by.shubelko.parsing.entity.AbstractMedProduct;
 import com.java.by.shubelko.parsing.exception.MedProductException;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractMedProductBuilder {
-    protected Set<MedProduct> medProducts;
+    protected final String SPACE_SEPARATOR = "\\s";
+    protected Set<AbstractMedProduct> medProducts;
 
     public AbstractMedProductBuilder() {
-        medProducts = new HashSet<MedProduct>();
+        medProducts = new HashSet<AbstractMedProduct>();
     }
 
-    public AbstractMedProductBuilder(Set<MedProduct> medProducts) {
-        this.medProducts = medProducts;
+    public AbstractMedProductBuilder(Set<AbstractMedProduct> abstractMedProducts) {
+        this.medProducts = abstractMedProducts;
     }
 
-    public Set<MedProduct> getMedProducts() {
+    public Set<AbstractMedProduct> getMedProducts() {
         return medProducts;
     }
 

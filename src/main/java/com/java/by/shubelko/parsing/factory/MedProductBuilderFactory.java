@@ -6,9 +6,9 @@ import com.java.by.shubelko.parsing.builder.MedProductDomBuilder;
 import com.java.by.shubelko.parsing.builder.MedProductSaxBuilder;
 import com.java.by.shubelko.parsing.builder.MedProductStaxBuilder;
 
-public class ParserBuilderFactory {
+public class MedProductBuilderFactory {
 
-    private ParserBuilderFactory() {
+    private MedProductBuilderFactory() {
     }
 
     public enum TypeParser {

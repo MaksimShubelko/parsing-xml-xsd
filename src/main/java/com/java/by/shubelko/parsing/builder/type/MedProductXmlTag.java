@@ -1,8 +1,8 @@
-package com.java.by.shubelko.parsing.builder.enumsource;
+package com.java.by.shubelko.parsing.builder.type;
 
 public enum MedProductXmlTag {
 
-	MED_CATALOG,
+	MED_PRODUCTS,
 	MEDICINE,
 	BAA,
 	NAME,

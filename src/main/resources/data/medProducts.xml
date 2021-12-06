@@ -2,12 +2,12 @@
 <med-products
         xmlns="http://www.javacourse.by/med-product"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.javacourse.by/med-product schema.xsd ">
+        xsi:schemaLocation="http://www.javacourse.by/med-product medProductsSchema.xsd ">
 
     <medicine id="med1">
         <name>Atomax</name>
         <pharma>Med Company</pharma>
-        <group>metabolic</group>
+        <group>aminoacids</group>
         <analogs>Taurine</analogs>
         <version>
             <country>Israel</country>
@@ -110,7 +110,7 @@
         <name>FustumGel</name>
         <pharma>Med Company</pharma>
         <group>aminoacids</group>
-        <analogs></analogs>
+        <analogs>Sonosin</analogs>
         <version>
             <country>Russia</country>
             <certificate>85-98-F25.8RE</certificate>
@@ -214,7 +214,7 @@
         <name>Activirivani ugol</name>
         <pharma>PharmMed</pharma>
         <group>absorbents</group>
-        <analogs></analogs>
+        <analogs>Pohudin</analogs>
         <version>
             <country>Belarus</country>
             <certificate>565568/224.368</certificate>

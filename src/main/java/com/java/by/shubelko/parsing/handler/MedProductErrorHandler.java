@@ -7,7 +7,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class MedProductErrorHandler implements ErrorHandler{
+public class MedProductErrorHandler implements ErrorHandler {
 	
 	static Logger logger = LogManager.getLogger();
 	private boolean errorHappened = false;
